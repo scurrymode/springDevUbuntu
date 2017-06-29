@@ -88,6 +88,104 @@ public class BoardDAO {
 		}
 		return list;
 	}
+	public BoardVO boardContentData(int no){
+		BoardVO vo = new BoardVO();
+		try {
+			BasicDBObject where = new BasicDBObject();
+			where.put("no",no);
+			/*
+			 * put("no", 1) == where no=1
+			 * put("$lt",1) == <1
+			 * put("$gt",1) == >1
+			 * put("$le",1) == <=1
+			 * put("$ge",1) == >=1
+			 * put("$ne",1) == !=1
+			 * */
+			BasicDBObject obj = (BasicDBObject)dbc.findOne(where);
+			BasicDBObject up = new BasicDBObject();
+			up.put("hit", obj.getInt("hit")+1); //조회수 증가
+			dbc.update(where, new BasicDBObject("$set",up)); 
+			//update(조건, 바꿀꺼) $set을 안주고 그냥 up 넣으면 데이터 다 날라간다.
+			
+			obj=(BasicDBObject)dbc.findOne(where); //이제 업데이트 된 걸 읽어온다.
+			vo.setNo(obj.getInt("no"));
+			vo.setName(obj.getString("name"));
+			vo.setSubject(obj.getString("subject"));
+			vo.setRegdate(obj.getString("regdate"));
+			vo.setHit(obj.getInt("hit"));
+			vo.setContent(obj.getString("content"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return vo;
+	}
+	
+	public BoardVO boardUpdateData(int no){
+		BoardVO vo = new BoardVO();
+		try {
+			BasicDBObject where = new BasicDBObject();
+			where.put("no",no);
+			BasicDBObject obj = (BasicDBObject)dbc.findOne(where);
+			
+			vo.setNo(obj.getInt("no"));
+			vo.setName(obj.getString("name"));
+			vo.setSubject(obj.getString("subject"));
+			vo.setRegdate(obj.getString("regdate"));
+			vo.setHit(obj.getInt("hit"));
+			vo.setContent(obj.getString("content"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return vo;
+	}
+	
+	public boolean boardUpdate(BoardVO vo){
+		boolean bCheck=false;
+		try {
+			BasicDBObject where= new BasicDBObject();
+			where.put("no", vo.getNo());
+			BasicDBObject obj = (BasicDBObject)dbc.findOne(where);
+			/*
+			 * where은 {}안에 no:1같이 하나만 들어 있는상태,
+			 * obj는 where에 해당하는 {}을 다 가져온 상태, 그 안에 id, content, subject, 등등 다 가지고 있음
+			 * BasicDBObject는 {}를 의미한다. 
+			 * */
+			String db_pwd=obj.getString("pwd"); //obj안에 있는 pwd를 꺼냄
+			if(db_pwd.equals(vo.getPwd())){
+				bCheck=true;
+				BasicDBObject up = new BasicDBObject();
+				up.put("name", vo.getName());
+				up.put("subject", vo.getSubject());
+				up.put("content", vo.getContent());
+				dbc.update(where, new BasicDBObject("$set", up));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return bCheck;
+	}
+	public boolean boardDelete(int no, String pwd){
+		boolean bCheck=false;
+		try {
+			BasicDBObject where= new BasicDBObject();
+			where.put("no", no);
+			BasicDBObject obj = (BasicDBObject)dbc.findOne(where);
+			/*
+			 * where은 {}안에 no:1같이 하나만 들어 있는상태,
+			 * obj는 where에 해당하는 {}을 다 가져온 상태, 그 안에 id, content, subject, 등등 다 가지고 있음
+			 * BasicDBObject는 {}를 의미한다. 
+			 * */
+			String db_pwd=obj.getString("pwd"); //obj안에 있는 pwd를 꺼냄
+			if(db_pwd.equals(pwd)){
+				bCheck=true;
+				dbc.remove(where);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return bCheck;
+	}
+	
 	
 	
 }
