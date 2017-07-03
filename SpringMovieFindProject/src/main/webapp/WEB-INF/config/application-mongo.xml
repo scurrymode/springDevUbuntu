@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.8.xsd">
+
+<!-- 
+	Connection : MongoClient
+	DB : 
+	DBCollection : 
+ -->
+
+<!-- public class MongoTemplate{
+		private MongoClient mc;
+		private DB db;
+		public MongoTemplate(MongoClient mc, String dataBaseName){
+			this.mc=mc;
+			db=mc.getDB(databaseName);
+		}
+	}
+ -->
+<mongo:mongo-client host="211.238.142.111" id="mc" port="27017"/>
+<bean id="mt" class="org.springframework.data.mongodb.core.MongoTemplate">
+<constructor-arg ref="mc"/>
+<constructor-arg name="databaseName" value="mydb"/>
+</bean>
+
+
+</beans>
