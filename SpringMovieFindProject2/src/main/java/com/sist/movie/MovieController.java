@@ -1,5 +1,8 @@
 package com.sist.movie;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +14,16 @@ import com.sist.dao.MovieDAO;
 import com.sist.manager.MovieInfoVO;
 import com.sist.manager.MovieManager;
 import com.sist.manager.MovieVO;
+import com.sist.naver.NaverBlogManager;
 
+import java.io.*;
 import java.util.*;
 @Controller
 public class MovieController {
+	@Autowired
+	private Configuration conf; //이렇게 하면 configuration bean에 있는 정보대로 올려주나봐~!
+	@Autowired
+	private NaverBlogManager nbm;
    @Autowired
 	private MovieDAO dao;
    @Autowired
@@ -44,6 +53,12 @@ public class MovieController {
 	   model.addAttribute("vo", vo);
 	   model.addAttribute("page", page);
 	   model.addAttribute("main_jsp", "detail.jsp");
+	   //파일 만들기
+	   nbm.naverBlogData(vo.getTitle()); //검색하고
+	   nbm.naverXmlParse(); //파일 만들고
+	   hadoopFileDelete(); //올라가있던 파일 지우고
+	   copyFromLocal(); //새로 올린다.
+	   //분석 결과값 =>local => R(통계) => 몽고디비에 저장 => Web에 데이터 전송(그래프)
 	   return "main/main";
    }
    @RequestMapping("main/find.do")
@@ -94,6 +109,34 @@ public class MovieController {
 		   System.out.println(ex.getMessage());
 	   }
 	   return data;
+   }
+   
+   //1. 폴더 지우기(HDFS)
+   public void hadoopFileDelete(){
+	   try {
+		   //hadoop fs
+		   FileSystem fs = FileSystem.get(conf);
+		   if(fs.exists(new Path("/input/naver.txt"))){
+			   // rm -rf 
+			   fs.delete(new Path("/input/naver.txt"),true);
+		   }
+		   fs.close();
+	   } catch (Exception e) {
+		   e.printStackTrace();
+	   }
+   }
+   //2. 파일 올리기
+   //copyFromLocal(이건 사라졌고 appendToFile로 바뀜), copyToLocal(이 명령어는 아직 존재)
+   public void copyFromLocal(){
+	   try {
+		FileSystem fs = FileSystem.get(conf);
+		fs.copyFromLocalFile(new Path("/home/sist/movie_data/naver.txt"), new Path("/input/naver.txt")); //앞에꺼가 로컬, 뒤에가 하둡
+		//copyToLocal일때는 앞이 하둡, 뒤가 로컬일것!
+		fs.close();
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	   
    }
 }
 

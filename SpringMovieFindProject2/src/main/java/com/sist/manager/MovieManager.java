@@ -140,7 +140,8 @@ public class MovieManager {
 			System.out.println(ex.getMessage());
 		}
 	}
-	public List<MovieInfoVO> cgvMainData()
+	
+	public List<MovieInfoVO> cgvMainData() //씨지비에서 예매율 가져오기(실시간으로 띄워준다)
 	   {
 		   List<MovieInfoVO> list=new ArrayList<MovieInfoVO>();
 		   try
@@ -155,17 +156,16 @@ public class MovieManager {
 			   // regdate
 			   Elements delem=doc.select("span.txt-info strong");
 			   // link
-			   /*
-			    * div class="box-image">
-	                        <strong class="rank">No.1</strong>	
-	                        <a href="/movies/detail-view/?midx=79748">
-			    */
+			   
+			   // div class="box-image">
+	          //            <strong class="rank">No.1</strong>	
+	          //            <a href="/movies/detail-view/?midx=79748">
 			   Elements lelem=doc.select("div.box-contents a");
 			   // like
-			   /*
-			    *  <span class="count"> 
-	                                <strong><i>10,083</i><span>
-			    */
+			   //
+			   //  <span class="count"> 
+	          //                      <strong><i>10,083</i><span>
+	           
 			   Elements felem=doc.select("span.count strong i");
 			   int j=0;
 			   for(int i=0;i<7;i++)
@@ -202,160 +202,5 @@ public class MovieManager {
 		   }
 		   return list;
 	   }
-	// 7b429affa32c43e1adf62ad1eebb6928
-	/*
-	 *  https://apis.daum.net/search/blog?apikey={apikey}&q=īī����&output=xml
-	 */
-	/*public void movieReviewData(int page,String title)
-	{
-		try
-		{
-			URL url=new URL("https://apis.daum.net/search/blog?apikey=7b429affa32c43e1adf62ad1eebb6928&output=xml&result=20&pageno="+page+"&q="+URLEncoder.encode(title, "UTF-8"));
-			JAXBContext jc=JAXBContext.newInstance(Channel.class);
-			Unmarshaller um=jc.createUnmarshaller();
-			Channel ch=(Channel)um.unmarshal(url);
-			List<Item> list=ch.getItem();
-			FileWriter fw=new FileWriter("/home/sist/data/movie_review.txt",true);
-			for(Item item:list)
-			{
-				fw.write(item.getDescription()+"\n");
-			}
-			fw.close();
-		}catch(Exception ex)
-		{
-			System.out.println(ex.getMessage());
-		}
-	}*/
-	// ������ , �ڽ����ǽ� , ��ȭ ����
-	/*public List<MovieInfoVO> getRankData()
-	   {
-		   List<MovieInfoVO> mrv=new ArrayList<MovieInfoVO>();
-		   try
-		   {
-			   // $("div#title").hide()
-			   Document doc=Jsoup.connect("http://movie.naver.com/movie/sdb/rank/rmovie.nhn").get();
-			   Elements title=doc.select("td.title div.tit3");
-			   Elements id=doc.select("td.range");
-			   Elements type=doc.select("td.ac img");
-			   int j=1;
-			   for(int i=0;i<10;i++)
-			   {
-				   Element telem=title.get(i);
-				   Element ielem=id.get(i);
-				   Element typeElem=type.get(j);
-				   String img=typeElem.attr("src");
-				   String temp=img.substring(
-						   img.lastIndexOf("/")+1);
-				   System.out.println(temp);
-						   //+ielem.text());
-				   MovieInfoVO vo=new MovieInfoVO();
-				   vo.setImage("http://imgmovie.naver.net/2007/img/common/"+temp);
-				   vo.setTitle(telem.text());
-				   vo.setIdcrement(Integer.parseInt(ielem.text()));
-				   if(temp.equals("icon_up_1.gif"))
-				   {
-					   vo.setType(0);
-				   }
-				   else if(temp.equals("icon_down_1.gif"))
-				   {
-					   vo.setType(1);
-				   }
-				   else
-				   {
-					   vo.setType(2);
-				   }
-				   mrv.add(vo);
-				   j+=2;
-			   }
-		   }catch(Exception ex)
-		   {
-			   System.out.println(ex.getMessage());
-		   }
-		   return mrv;
-	   }
-	   public List<MovieInfoVO> getReserveRankData()
-	   {
-		   List<MovieInfoVO> mrv=new ArrayList<MovieInfoVO>();
-		   try
-		   {
-			   // $("div#title").hide()
-			   Document doc=Jsoup.connect("http://movie.naver.com/movie/sdb/rank/rreserve.nhn").get();
-			   Elements title=doc.select("td.title div.tit4");
-			   Elements reserve=doc.select("td.reserve_per");
-			   
-			   for(int i=0;i<10;i++)
-			   {
-				   Element telem=title.get(i);
-				   Element relem=reserve.get(i);
-				   
-				   MovieInfoVO vo=new MovieInfoVO();
-				   vo.setTitle(telem.text());
-				   String temp=relem.text();// 61.05%
-				   temp=temp.substring(0,temp.lastIndexOf("%"));
-				   vo.setReserve(Double.parseDouble(temp));
-				   mrv.add(vo);
-			   }
-		   }catch(Exception ex)
-		   {
-			   System.out.println(ex.getMessage());
-		   }
-		   return mrv;
-	   }
-	   public List<MovieInfoVO> getBoxRankData()
-	   {
-		   List<MovieInfoVO> mrv=new ArrayList<MovieInfoVO>();
-		   try
-		   {
-			   // $("div#title").hide()
-			   Document doc=Jsoup.connect("http://movie.naver.com/movie/sdb/rank/rboxoffice.nhn").get();
-			   Elements title=doc.select("td.title div.tit1");
-			   Elements showUser=doc.select("td.reserve_cnt em");
-			   Elements marketShare=doc.select("td.reserve_per");
-			   for(int i=0;i<10;i++)
-			   {
-				   Element telem=title.get(i);
-				   Element selem=showUser.get(i);
-				   Element melem=marketShare.get(i);
-				   MovieInfoVO vo=new MovieInfoVO();
-				   vo.setTitle(telem.text());
-				   String su=selem.text();// 53529
-				   su=su.replace(",", "");
-				   vo.setShowUser(Integer.parseInt(su));
-				   String ms=melem.text();
-				   ms=ms.substring(0,ms.lastIndexOf("%"));// 3.70%
-				   vo.setMarketShare(Double.parseDouble(ms));
-				   mrv.add(vo);
-			   }
-		   }catch(Exception ex)
-		   {
-			   System.out.println(ex.getMessage());
-		   }
-		   return mrv;
-	   }
-	   public void movieReviewData1(int page,String title)
-		{
-			try
-			{
-				URL url=new URL("https://apis.daum.net/search/blog?apikey=7b429affa32c43e1adf62ad1eebb6928&output=xml&result=20&pageno="+page+"&q="+URLEncoder.encode(title, "UTF-8"));
-				JAXBContext jc=JAXBContext.newInstance(Channel.class);
-				Unmarshaller um=jc.createUnmarshaller();
-				Channel ch=(Channel)um.unmarshal(url);
-				List<Item> list=ch.getItem();
-				FileWriter fw=new FileWriter("/home/sist/total/movie_daum",true);
-				for(Item item:list)
-				{
-					fw.write(item.getDescription()+"\n");
-				}
-				fw.close();
-			}catch(Exception ex)
-			{
-				System.out.println(ex.getMessage());
-			}
-		}
-*/
+	   
 }
-
-
-
-
-

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:hadoop="http://www.springframework.org/schema/hadoop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+<hadoop:configuration id="hadoopConf">
+fs.default.name=hdfs://NameNode:9000
+</hadoop:configuration>
+
+<!--자바라면
+	Configuration conf = new Configuration();
+	conf.set("fs.default.name","hdfs://NameNode:9000");
+ -->
+
+<hadoop:job id="movieJob"
+	configuration-ref="hadoopConf"
+	input-path="/input_ns3/"
+	output-path="/output_ns3/"
+	mapper="com.sist.mapred.MovieMapper"
+	reducer="com.sist.mapred.MovieReducer"
+	scope="prototype"
+/>
+<!-- 여러개를 동시에 분석한다면 job을 몇개 더 추가해서 처리하겠당~! -->
+
+<!-- 자바라면
+	Job movieJob = new Job(hadoopConf);
+	movieJob.setMapperClass(MovieMapper.class);
+	movieJob.setReducerClass(MovieReducer.class);
+	FileInputFormat.setInputPath("/input/");
+	FileOutputFormat.addOutputPath("/output_ns3/"); //노드별 번호
+ -->
+<hadoop:job-runner job-ref="movieJob" run-at-startup="false"/>
+</beans>
