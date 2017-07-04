@@ -21,8 +21,8 @@ import java.io.*;
 @Component("mm")
 public class MovieManager {
 	@Autowired
-	 private MovieDAO dao;
-    private List<String> list=
+	private MovieDAO dao;
+   private List<String> list=
     		new ArrayList<String>();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
