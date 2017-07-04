@@ -1,16 +1,24 @@
 package com.sist.r;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.simple.JSONObject;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
+import com.sist.dao.MovieDAO;
+import com.sist.manager.MovieVO;
 
 import twitter4j.internal.org.json.JSONArray;
 
 @Component
 public class RManager {
+	@Autowired
+	private MovieDAO dao;
 	// /home/sist/springDev/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/SpringMovieFindProject2/
 	public String rFeelGraph(){
 		String result="[";
@@ -36,5 +44,27 @@ public class RManager {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	
+	//추천 그래프 그리기
+	public List<MovieVO> recommandData(){
+		List<MovieVO> list = new ArrayList<MovieVO>();
+		try {
+			RConnection rc = new RConnection();
+			rc.voidEval("data<-read.table(\"/home/sist/movie_data/recommand_result\")");
+			rc.voidEval("data1<-data[order(data$V2,decreasing=T),c(\"V1\",\"V2\")]");
+			REXP p=rc.eval("data1$V1");
+			String[] title=p.asStrings();
+			
+			for(int i=0; i<12;i++){
+				MovieVO vo=dao.movieRecommandData(title[i].replace(",", " "));
+				list.add(vo);
+			}
+			rc.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 }

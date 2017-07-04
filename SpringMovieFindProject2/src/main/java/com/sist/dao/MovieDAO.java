@@ -19,8 +19,7 @@ public class MovieDAO {
    public List<String> movieAllGenre()
    {
 	   // SELECT DISTINCT genre FROM table
-	   return mt.getCollection("movie").
-			    distinct("genre");
+	   return mt.getCollection("movie").distinct("genre");
    }
    public List<MovieVO> movieAllData(int page)
    {
@@ -57,6 +56,22 @@ public class MovieDAO {
 	   List<MovieVO> list=new ArrayList<MovieVO>();
 	   BasicQuery query=new BasicQuery("{genre:{'$regex':'.*"+genre+"'}}");
 	   list=mt.find(query,MovieVO.class,"movie");
+	   return list;
+   }
+   public List<String> movieTitleAllData(){
+	   List<String> list=new ArrayList<String>();
+	   Query query=new Query();
+	   List<MovieVO> mList=mt.find(query, MovieVO.class, "movie"); //데이터 읽어오기
+	   for(MovieVO vo:mList){
+		   list.add(vo.getTitle());
+	   }
+	   return list;
+   }
+   public MovieVO movieRecommandData(String title)
+   {
+	   MovieVO list=new MovieVO();
+	   BasicQuery query=new BasicQuery("{title:'"+title+"'}");
+	   list=mt.findOne(query,MovieVO.class,"movie");
 	   return list;
    }
    

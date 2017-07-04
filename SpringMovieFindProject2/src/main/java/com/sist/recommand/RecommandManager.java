@@ -1,4 +1,4 @@
-package com.sist.naver;
+package com.sist.recommand;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,15 +14,18 @@ import javax.xml.bind.Unmarshaller;
 
 import org.springframework.stereotype.Component;
 
+import com.sist.naver.Item;
+import com.sist.naver.Rss;
+
 @Component
-public class NaverBlogManager {
+public class RecommandManager {
 	public static void main(String[] arg){
-		NaverBlogManager n = new NaverBlogManager();
-		n.naverBlogData("박열");
+		RecommandManager n = new RecommandManager();
+		n.naverBlogData("여름에 볼만한 영화");
 		System.out.println("저장완료");
 		n.naverXmlParse();
 	}
-
+	
     public void naverBlogData(String title) {
         String clientId = "8qNQiH_FItebuJu160WR";//애플리케이션 클라이언트 아이디값";
         String clientSecret = "kbAvJiZBTF";//애플리케이션 클라이언트 시크릿값";
@@ -48,7 +51,7 @@ public class NaverBlogManager {
                 response.append(inputLine);
             }
             br.close();
-            FileWriter fw = new FileWriter("/home/sist/movie_data/movie_reply.xml");
+            FileWriter fw = new FileWriter("/home/sist/movie_data/recommand.xml");
             fw.write(response.toString());
             fw.close();
         } catch (Exception e) {
@@ -58,7 +61,7 @@ public class NaverBlogManager {
     }
     public void naverXmlParse(){
     	try {
-			File file = new File("/home/sist/movie_data/movie_reply.xml");
+			File file = new File("/home/sist/movie_data/recommand.xml");
 			JAXBContext jc = JAXBContext.newInstance(Rss.class);
 			Unmarshaller un = jc.createUnmarshaller();
 			Rss rss = (Rss)un.unmarshal(file);
@@ -69,7 +72,7 @@ public class NaverBlogManager {
 			}
 			data=data.substring(0,data.lastIndexOf("\n"));
 			data=data.replaceAll("[^가-힣 ]", "");
-			FileWriter fw = new FileWriter("/home/sist/movie_data/naver.txt");
+			FileWriter fw = new FileWriter("/home/sist/movie_data/recommand_ns3.txt");
 			fw.write(data);;
 			fw.close();
 		} catch (Exception e) {

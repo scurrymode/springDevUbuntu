@@ -19,10 +19,18 @@ fs.default.name=hdfs://NameNode:9000
 
 <hadoop:job id="movieJob"
 	configuration-ref="hadoopConf"
-	input-path="/input_ns3/"
-	output-path="/output_ns3/"
+	input-path="/input_movie_ns3/"
+	output-path="/output_movie_ns3/"
 	mapper="com.sist.mapred.MovieMapper"
 	reducer="com.sist.mapred.MovieReducer"
+	scope="prototype"
+/>
+<hadoop:job id="recommandJob"
+	configuration-ref="hadoopConf"
+	input-path="/input_recom_ns3/"
+	output-path="/output_recom_ns3/"
+	mapper="com.sist.mapred.RecommandMapper"
+	reducer="com.sist.mapred.RecommandReducer"
 	scope="prototype"
 />
 <!-- 여러개를 동시에 분석한다면 job을 몇개 더 추가해서 처리하겠당~! -->
@@ -34,5 +42,6 @@ fs.default.name=hdfs://NameNode:9000
 	FileInputFormat.setInputPath("/input/");
 	FileOutputFormat.addOutputPath("/output_ns3/"); //노드별 번호
  -->
-<hadoop:job-runner job-ref="movieJob" run-at-startup="false"/>
+<hadoop:job-runner job-ref="movieJob" id="mj" run-at-startup="false"/>
+<hadoop:job-runner job-ref="recommandJob" id="rj" run-at-startup="false"/>
 </beans>

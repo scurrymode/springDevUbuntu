@@ -17,9 +17,12 @@ import com.sist.manager.MovieManager;
 import com.sist.manager.MovieVO;
 import com.sist.naver.NaverBlogManager;
 import com.sist.r.RManager;
+import com.sist.recommand.RecommandManager;
 
 import java.io.*;
 import java.util.*;
+
+import javax.annotation.Resource;
 
 @Controller
 public class MovieController {
@@ -31,10 +34,15 @@ public class MovieController {
 	private MovieDAO dao;
 	@Autowired
 	private MovieManager mgr;
-	@Autowired
+	@Resource(name="mj")
 	private JobRunner jr;
+	@Resource(name="rj")
+	private JobRunner recomm;
+	@Autowired
+	private RecommandManager rcm;
 	@Autowired
 	private RManager rm;
+	
 
 	@RequestMapping("main/main.do")
 	public String movie_main(String page, Model model) {
@@ -97,6 +105,32 @@ public class MovieController {
 		model.addAttribute("main_jsp", "../genre/genre.jsp");
 		return "main/main";
 	}
+	
+	@RequestMapping("main/recommand.do")
+	public String main_recommand(String redata, Model model) {
+		if(redata==null){
+			redata="더운날";
+		}
+		redata=redata+"에 볼만한 영화";
+		rcm.naverBlogData(redata);
+		rcm.naverXmlParse();
+		recommFileDelete();
+		recommCopyFromLocal();
+		
+		try {
+			recomm.call();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		recommCopyToLocal();
+		List<MovieVO> list = rm.recommandData();
+		String json = jsonCreate(list);
+		model.addAttribute("json", json);
+		model.addAttribute("genre", redata);
+		model.addAttribute("main_jsp", "../genre/recommand.jsp");
+		return "main/main";
+	}
+	
 
 	public String jsonCreate(List<MovieVO> list) {
 		String data = "";
@@ -127,13 +161,13 @@ public class MovieController {
 		try {
 			// hadoop fs
 			FileSystem fs = FileSystem.get(conf);
-			if (fs.exists(new Path("/input_ns3/naver.txt"))) {
+			if (fs.exists(new Path("/input_movie_ns3/naver_ns3.txt"))) {
 				// rm -rf
-				fs.delete(new Path("/input_ns3/naver.txt"), true);
+				fs.delete(new Path("/input_movie_ns3/naver_ns3.txt"), true);
 			}
-			if (fs.exists(new Path("/output_ns3"))) {
+			if (fs.exists(new Path("/output_movie_ns3"))) {
 				// rm -rf
-				fs.delete(new Path("/output_ns3"), true);
+				fs.delete(new Path("/output_movie_ns3"), true);
 			}
 			fs.close();
 		} catch (Exception e) {
@@ -146,7 +180,7 @@ public class MovieController {
 	public void copyFromLocal() {
 		try {
 			FileSystem fs = FileSystem.get(conf);
-			fs.copyFromLocalFile(new Path("/home/sist/movie_data/naver.txt"), new Path("/input_ns3/naver.txt")); 
+			fs.copyFromLocalFile(new Path("/home/sist/movie_data/naver.txt"), new Path("/input_movie_ns3/naver_ns3.txt")); 
 			// 앞에꺼가 로컬, 뒤에꺼가 하둡
 			// copyToLocal일때는 앞이 하둡, 뒤가 로컬일것!
 			fs.close();
@@ -158,10 +192,55 @@ public class MovieController {
 	public void copyToLocal() {
 		try {
 			FileSystem fs = FileSystem.get(conf);
-			fs.copyToLocalFile(new Path("/output_ns3/part-r-00000"), new Path("/home/sist/movie_data/result"));
+			fs.copyToLocalFile(new Path("/output_movie_ns3/part-r-00000"), new Path("/home/sist/movie_data/result"));
 			fs.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	//여긴 추천하기 이렇게 할 필요 없고 매개변수로 하면 되는뎅.... 바보임...ㅋㅋ
+	// 1. 폴더 지우기(HDFS)
+		public void recommFileDelete() {
+			try {
+				// hadoop fs
+				FileSystem fs = FileSystem.get(conf);
+				if (fs.exists(new Path("/input_recom_ns3/recommand_ns3.txt"))) {
+					// rm -rf
+					fs.delete(new Path("/input_recom_ns3/recommand_ns3.txt"), true);
+				}
+				if (fs.exists(new Path("/output_recom_ns3"))) {
+					// rm -rf
+					fs.delete(new Path("/output_recom_ns3"), true);
+				}
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		// 2. 파일 올리기
+		// copyFromLocal(이건 사라졌고 appendToFile로 바뀜), copyToLocal(이 명령어는 아직 존재)
+		public void recommCopyFromLocal() {
+			try {
+				FileSystem fs = FileSystem.get(conf);
+				fs.copyFromLocalFile(new Path("/home/sist/movie_data/recommand_ns3.txt"), new Path("/input_recom_ns3/recommand_ns3.txt")); 
+				// 앞에꺼가 로컬, 뒤에꺼가 하둡
+				// copyToLocal일때는 앞이 하둡, 뒤가 로컬일것!
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void recommCopyToLocal() {
+			try {
+				FileSystem fs = FileSystem.get(conf);
+				fs.copyToLocalFile(new Path("/output_recom_ns3/part-r-00000"), new Path("/home/sist/movie_data/recommand_result"));
+				
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 }

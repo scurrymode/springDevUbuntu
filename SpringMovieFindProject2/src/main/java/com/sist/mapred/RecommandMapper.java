@@ -1,6 +1,8 @@
 package com.sist.mapred;
 
+
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,30 +10,34 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class MovieMapper extends Mapper<LongWritable, Text, Text, IntWritable>{ //앞두개는 입력값 뒤두개는 출력값
+import com.sist.dao.MovieDAO;
+import com.sist.recommand.RecommandDAO;
+
+public class RecommandMapper extends Mapper<LongWritable, Text, Text, IntWritable>{ //앞두개는 입력값 뒤두개는 출력값
 	//단어를 나눠주는애
 	//1. read a book 
 	//2. write a book
 	//Mapper는 read:1, a:1, book:1, write:1, a:1, book:1 가지고 
 	//셔플(쇼트)해서 a[1,1] book[1,1] read[1] write[1] 이렇게 준다.
 	//Reducer는 a:2, book:2, read:1, write:1 해준다.
+	
 	private final IntWritable one = new IntWritable(1);
 	private Text result = new Text();
-	String[] feel = {"사랑","로맨스","매력","즐거움","스릴", "소름","긴장","공포","유머","웃음","개그",
-			"행복","전율","경이","우울","절망","신비", "여운","희망","긴박","감동","감성","휴머니즘",
-			"자극","재미","액션","반전","비극","미스테리", "판타지","꿈","설레임","흥미","풍경","일상",
-			"순수","힐링","눈물","그리움","호러","충격","잔혹", "드라마","멜로","애정",
-			"모험","느와르","다큐멘터리", "코미디","범죄","SF","애니메이션"	
-	};
+	private RecommandDAO dao = new RecommandDAO();// 이렇게 한 이유는 2가지 이 Mapper가 하둡 xml로 인해 메모리에 올라가서 spring으로 올리는 @Autowired를 사용할 수 없고,
+	//굳이 MovidDAO가 아닌 새로운 RecommandDAO를 만든 이유는 MovieDAO의 경우 몽고디비 연결이 @Autowired로 되어있었기 때문이다.
+	
 	@Override
 	protected void map(LongWritable key, Text value, Mapper<LongWritable, Text, Text, IntWritable>.Context context)
 			throws IOException, InterruptedException {
-		Pattern[] p = new Pattern[feel.length];
+		List<String> list = dao.movieTitleAllData(); //DB안의 영화 제목과 비교하기~!
+		Pattern[] p = new Pattern[list.size()];
 		for(int i=0; i<p.length;i++){
-			p[i]=Pattern.compile(feel[i]);
+			String str=list.get(i);
+			p[i]=Pattern.compile(str);
 		}
-		Matcher[] m = new Matcher[feel.length];
+		Matcher[] m = new Matcher[list.size()];
 		for(int i=0;i<m.length;i++){
 			m[i]=p[i].matcher(value.toString());
 			while(m[i].find()){
@@ -40,5 +46,6 @@ public class MovieMapper extends Mapper<LongWritable, Text, Text, IntWritable>{ 
 				context.write(result, one);
 			}
 		}	
-	}
+	}	
 }
+

@@ -71,8 +71,9 @@ Highcharts.chart('container', {
         <img src="feel.png">
      </div> -->
      <div id="container" style="height: 400px"></div>
-   
+     
      <div id="pagination">
+        <a href="recommand.do">추천</a>
         <a href="main.do?page=${page }">목록</a>
      </div>
    </div>
