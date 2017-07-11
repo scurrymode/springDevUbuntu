@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.8.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+
+	<util:properties id="mongo" location="/WEB-INF/config/mongo.properties"/>
+	<mongo:mongo-client
+		host="#{mongo['host']}"
+		port="#{mongo['port']}"
+		id="mc"
+	/>
+	<!-- public class MongoClient
+		{
+			private String host;
+			private int port;
+			getter/setter
+		}
+	 -->
+	<bean id="mt" class="org.springframework.data.mongodb.core.MongoTemplate">
+	<constructor-arg ref="mc"/>
+	<constructor-arg name="databaseName" value="#{mongo['database']}"/>
+	<!-- public class MongoTemplate
+		{
+			private MongoClient mc;
+			private String databaseName;
+			public MongoTemplate(MongoClient mc, String db)
+			{
+				this.mc=mc;
+				databaseName=db;
+			}
+		}
+		Setter DI (host=, port=)
+		Constructor DI(constructor-arg)
+		Method DI(init-method, destroy-method)
+		
+		Spring 생명주기(등록된 클래스)
+		1. 메모리할당 1) <bean> 2) Annotation(@Controller, @Repository, @Service, @Component)
+		2. setter DI
+		3. Method DI(init-method)
+		4. 프로그래머 활용
+		5. Method DI(destroy-method)
+			@PreDestroy 
+	 -->
+	
+	
+	</bean>
+
+</beans>
