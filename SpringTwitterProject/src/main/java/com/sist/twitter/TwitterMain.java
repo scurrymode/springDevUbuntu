@@ -1,8 +1,11 @@
 package com.sist.twitter;
 
+import com.sist.html.NaverRealTimeRanking;
+
 import twitter4j.FilterQuery;
 import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
+import java.util.*;
 
 public class TwitterMain {
 /*
@@ -27,10 +30,18 @@ public class TwitterMain {
     10 스타크래프트 리마스터
     데이터랩 그래프 보기
  * */
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
-			String[] data = {"전소민","추자현","류석춘","우효광","원펀치","강연재","학교2017","수소차","넉살","스타크래프트 리마스터"};
+			/*String[] data = {"전소민","추자현","류석춘","우효광","원펀치","강연재","학교2017","수소차","넉살","스타크래프트 리마스터"};*/
+			List<String> nList=NaverRealTimeRanking.naverRank();
+			String[] data = new String[nList.size()];
+			int i=0;
+			for(String s : nList){
+				data[i]=s;
+				i++;
+			}
 		
 			TwitterStream ts = new TwitterStreamFactory().getInstance();
 			TwitterListener list = new TwitterListener();

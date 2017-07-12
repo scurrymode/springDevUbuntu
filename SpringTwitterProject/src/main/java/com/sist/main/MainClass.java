@@ -63,7 +63,7 @@ public class MainClass {
 	public void hadoopResultSend(){
 		try {
 			FileSystem fs = FileSystem.get(conf);
-			fs.copyToLocalFile(new Path("/tweet_ouput/part-r-00000"), new Path("/home/sist/r-data/twitter_result"));
+			fs.copyToLocalFile(new Path("/tweet_output/part-r-00000"), new Path("/home/sist/r-data/twitter_result"));
 			fs.close();
 			System.out.println("분석 결과 가지고 옴");
 			
