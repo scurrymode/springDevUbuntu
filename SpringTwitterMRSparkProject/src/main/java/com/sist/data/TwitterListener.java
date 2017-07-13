@@ -27,10 +27,11 @@ public class TwitterListener implements StatusListener {
 
 	@Override
 	public void onStatus(Status status) { //한줄을 읽을 때마다 호출되는 이벤트
-		String data = status.getText();
+		String data = status.getText();//내가 건 필터로 검색되는 트위터 새글
 		//data=data.replace("[^가-힣 ]", "");
+		System.out.println(data);
 		try {
-			FileWriter fw = new FileWriter("./input/daum.txt",true);
+			FileWriter fw = new FileWriter("./input/naver.txt",true);
 			fw.write(data);
 			fw.close();
 		} catch (Exception e) {

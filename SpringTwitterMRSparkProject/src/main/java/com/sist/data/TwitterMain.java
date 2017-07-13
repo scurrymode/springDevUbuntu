@@ -9,7 +9,7 @@ import twitter4j.TwitterStreamFactory;
 public class TwitterMain {
 	public static void main(String[] args) {
 		try {
-			List<String> list = RankData.daumRank();
+			List<String> list = RankData.naverRank();
 			String[] data = new String[list.size()];
 			int i=0;
 			for(String s:list){
