@@ -17,7 +17,7 @@ public class DaumManager {
 				data+=daumReviewData(i, title);
 			}
 			FileWriter fw = new FileWriter("/home/sist/music_data/daum.txt");
-			fw.write(data);
+			fw.write(data.replaceAll("^[가-힣 ]", ""));//한글 외 나머지는 다 지워
 			fw.close();
 		} catch (Exception e) {
 			e.printStackTrace();

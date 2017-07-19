@@ -55,4 +55,17 @@ public class MusicManager {
 		}
 		return url;
 	}
+	public MusicVO musicDetailData(String title){
+		MusicVO vo= new MusicVO();
+		List<MusicVO> list = musicTop10();
+		for(MusicVO m:list){
+			if(title.equals(m.getTitle())){
+				vo.setTitle(m.getTitle());
+				vo.setRank(m.getRank());
+				vo.setSinger(m.getSinger());
+			}
+		}
+		vo.setLink(youtubeGetLink(title));
+		return vo;
+	}
 }

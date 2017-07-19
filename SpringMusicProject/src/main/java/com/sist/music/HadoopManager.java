@@ -44,7 +44,7 @@ public class HadoopManager {
 	public void copyToLocal(){
 		try {
 			FileSystem fs = FileSystem.get(conf);
-			fs.copyToLocalFile(new Path("/music_output/part-r-00000"), new Path("/home/sist/music_data/music_result.txt"));
+			fs.copyToLocalFile(new Path("/music_output/part-r-00000"), new Path("/home/sist/music_data/music_result"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

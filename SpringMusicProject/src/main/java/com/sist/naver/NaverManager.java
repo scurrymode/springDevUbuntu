@@ -68,9 +68,9 @@ public class NaverManager {
 				data+=i.getDescription()+"\n";
 			}
 			data=data.substring(0,data.lastIndexOf("\n"));
-			data=data.replaceAll("[^가-힣 ]", "");
+			//data=data.replaceAll("[^가-힣 ]", "");
 			FileWriter fw = new FileWriter("/home/sist/music_data/naver.txt");
-			fw.write(data);;
+			fw.write(data.replaceAll("^[가-힣 ]", ""));;
 			fw.close();
 		} catch (Exception e) {
 			e.printStackTrace();

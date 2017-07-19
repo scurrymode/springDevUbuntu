@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.sist.R.RManager;
 import com.sist.daum.DaumManager;
 import com.sist.manager.MusicManager;
 import com.sist.manager.MusicVO;
@@ -30,6 +31,8 @@ public class MusicController {
 	private NaverManager nm;
 	@Autowired
 	private HadoopManager hm;
+	@Autowired
+	private RManager rm;
 	
 	@RequestMapping(value="main/main.do", method=RequestMethod.GET)
 	public String main_main(Model model){
@@ -63,6 +66,13 @@ public class MusicController {
 		
 		hm.mapReduceExecute();
 		hm.copyToLocal();
-		return "main/main";
+		
+		MusicVO vo = mgr.musicDetailData(title);
+		model.addAttribute("vo", vo);
+		
+		rm.barchart();
+		rm.wordCloud();
+		
+		return "main/detail";
 	}
 }
