@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/config/application-*.xml</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	<!-- 서비스 흐름
+		Spring
+		1) client 요청 (*.do)
+		2) DispatcherServlet 요청받는 클래스(web.xml)에 설정
+		3) HandlerMapping 요청 처리 클래스 찾기 @Controller 올라간 것만 찾아
+			처리하는 클래스(Model) 제작
+		4) DispatcherServlet 결과값 받기 model(request)
+		5)	이 결과값을 viewResolver에게 전달(경로명, 확장자 같이 보내줌)dispatcher-servlet.xml에 설정
+		6) viewResolver가 view(jsp파일)로 연결해줘 jsp는 jstl과 el사용해서 표현
+		
+		DI(setter DI: @Autowired, @Resource)
+			method DI: 객체 생성과 소멸(생명주기관리)을 담당하는 역할
+		AOP(반복적인 수행을 자동처리해주는 역할)
+	 -->
+	
+	<!--Post방식의 한글 인코딩 부분 -->
+	<filter> 
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param> 
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+</web-app>
